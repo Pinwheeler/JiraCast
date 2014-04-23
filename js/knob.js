@@ -43,7 +43,28 @@ $(function($) {
             return value + '%';
         },*/
         draw : function () {
+			// get value and change color based on it
+			var value = this.v;
+			var perc = value * 511/(this.o.max);
+			if (perc > 500)
+		    	perc = 500;
+		    var redValue;
+		    var greenValue;
+		    if (perc < 200) {
+		        redValue = 255;
+		        greenValue = Math.sqrt(perc) * 16;
+		        greenValue = Math.round(greenValue);
+		    } else {
+		        greenValue = 255;
+		        perc = perc - 255;
+		        redValue = 255 - (perc * perc / 255)
+		        redValue = Math.round(redValue);
+		    }
+		    var hexColor = "#" + redValue.toString(16) + greenValue.toString(16) + "00";
+		    this.fgColor = hexColor;
+            this.o.fgColor = hexColor;
 
+			
             // "tron" case
             if(this.$.data('skin') == 'tron') {
 
@@ -54,14 +75,6 @@ $(function($) {
                     , r = 1;
 
                 this.g.lineWidth = this.lineWidth;
-
-                if (this.o.displayPrevious) {
-                    pa = this.arc(this.v);
-                    this.g.beginPath();
-                    this.g.strokeStyle = this.pColor;
-                    this.g.arc(this.xy, this.xy, this.radius - this.lineWidth, pa.s, pa.e, pa.d);
-                    this.g.stroke();
-                }
 
                 this.g.beginPath();
                 this.g.strokeStyle = r ? this.o.fgColor : this.fgColor ;
