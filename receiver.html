@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Cast Hello Text</title>
+
+	<link type="text/css" rel="stylesheet" href="styles.css" media="all">
+
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,700" rel="stylesheet" type="text/css">
+	
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js" type="text/javascript"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-min.js" type="text/javascript"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/knockout-validation/1.0.2/knockout.validation.min.js" type="text/javascript"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+
+	<script src="https://ajax-db.appspot.com/access.js"></script>
+	
+	<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+
+		// Constant for https://ajax-db.appspot.com/access.js
+		APP_ID = 5685265389584384;
+
+        var dataContextClass = function () {
+            var self = this;
+
+            self.displayName = ko.observable();
+
+            self.openIssues = ko.observableArray();
+            self.inProgressIssues = ko.observableArray();
+            self.inReviewIssues = ko.observableArray();
+            self.closedIssues = ko.observableArray();
+
+            self.showInfo = ko.observable(false);
+
+            self.db = new AjaxDB();
+
+            self.queryJira = function(username, password, jql, callback) {
+              self.db.query('queryJira', {
+                'username': username,
+                'password': password,
+                'jql': encodeURI(jql)
+              }, callback);
+            };
+
+            self.initCast = function () {
+            	// cast.receiver.logger.setLevelValue(0);
+            	
+            	window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+            	//	console.log('Starting Receiver Manager');
+
+            	//	handler for the 'ready' event
+            	castReceiverManager.onReady = function(event) {
+            		//	console.log('Received Ready event: ' + JSON.stringify(event.data));
+            		window.castReceiverManager.setApplicationState("Application status is ready...");
+            	};
+
+            	// handler for 'senderconnected' event
+            	castReceiverManager.onSenderConnected = function(event) {
+            		//	console.log('Received Sender Connected event: ' + event.data);
+            		//	console.log(window.castReceiverManager.getSender(event.data).userAgent);
+            	};
+
+            	// handler for 'senderdisconnected' event
+            	castReceiverManager.onSenderDisconnected = function(event) {
+            		// console.log('Received Sender Disconnected event: ' + event.data);
+            		if (window.castReceiverManager.getSenders().length == 0) {
+            			window.close();
+            		}
+            	};
+
+            	// handler for 'systemvolumechanged' event
+            	castReceiverManager.onSystemVolumeChanged = function(event) {
+            		// console.log('Received System Volume Changed event: ' + event.data['level'] + ' ' + event.data['muted']);
+            	};
+
+            	// create a CastMessageBus to handle messages for a custom namespace
+            	window.messageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:com.google.cast.sample.helloworld');
+
+            	// handler for the CastMessageBus message event
+            	window.messageBus.onMessage = function(event) {
+            		//console.log('Message [' + event.senderId + ']: ' + event.data);
+
+            		// display the message from the sender
+            		self.showUserInfo(event.data);
+
+            		// inform all senders on the CastMessageBus of the incoming message event
+            		// sender message listener will be invoked
+            		window.messageBus.send(event.senderId, event.data);
+            	}
+
+            	// initialize the CastReceiverManager with an application status message
+            	window.castReceiverManager.start({statusText: "Application is starting"});
+            	// console.log('Receiver Manager started');
+            };
+
+    		self.showUserInfo = function(userId) {
+
+    			var jql = 'project = LC AND fixVersion = "XRM R 1.0 MVP" AND updated >= -3w AND assignee in (' + userId + ') ORDER BY assignee ASC, status ASC';
+
+    			//var jql = 'project = LCS AND status in (Open, "In Progress", Reopened, "Ready for CR Review", "Ready for QA Review") AND updated >= -3w ORDER BY assignee ASC, status ASC';
+
+    			self.queryJira( 'rainer.gonzalez', 'jira2014', jql, function (data) {
+
+    				var parseJSONData = JSON.parse(JSON.parse(data));
+
+    				var tempOpenIssues = [];
+    				var tempInProgressIssues = [];
+    				var tempInReviewIssues = [];
+    				var tempClosedIssues = [];
+
+    				for (var i = 0; i < parseJSONData.issues.length; i++) {
+
+    					switch (parseJSONData.issues[i].fields.status.name) {
+    						case "Open":
+    							tempOpenIssues.push(parseJSONData.issues[i]);
+    							break;
+
+    						case "In Progress":
+    							tempInProgressIssues.push(parseJSONData.issues[i]);
+    							break;
+
+    						case "In Review":
+								tempInReviewIssues.push(parseJSONData.issues[i]);
+    							break;
+
+    						case "Closed":
+								tempClosedIssues.push(parseJSONData.issues[i]);
+    							break;
+    					}
+    				}
+
+    				self.displayName(parseJSONData.issues[0].fields.assignee.displayName);
+
+					self.openIssues(tempOpenIssues);
+    				self.inProgressIssues(tempInProgressIssues);
+    				self.inReviewIssues(tempInReviewIssues);
+    				self.closedIssues(tempClosedIssues);
+
+    				self.showInfo(true);
+
+    				window.castReceiverManager.setApplicationState(userId);
+
+    			});
+    		};
+        };
+
+        window.dataContext = new dataContextClass();
+       
+
+        $(document).ready(function () {
+            ko.applyBindings(window.dataContext);
+
+            window.dataContext.showUserInfo(event.data);
+
+            //window.dataContext.initCast();
+        });
+	    
+	</script>
+</head>
+
+<body>
+	<div class="name" data-bind="text: displayName">We are hiring drunks for social events.<br/>We are serious people!</div>
+		
+		<!-- ko if: showInfo() -->
+
+		<div class="issues-info">
+			<div class="list">
+				<span>Open</span>
+				<hr>
+				<ul data-bind="foreach: openIssues">
+					<li>
+						<div class="issue">
+							<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+							<div class="description" data-bind="html: fields.summary"></div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="list">
+				<span>In Progress</span>
+				<hr>
+				<ul data-bind="foreach: inProgressIssues">
+					<li>
+						<div class="issue">
+							<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+							<div class="description" data-bind="html: fields.summary"></div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="list">
+				<span>In Review</span>
+				<hr>
+				<ul data-bind="foreach: inReviewIssues">
+					<li>
+						<div class="issue">
+							<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+							<div class="description" data-bind="html: fields.summary"></div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="list">
+				<span>Closed</span>
+				<hr>
+				<ul data-bind="foreach: closedIssues">
+					<li>
+						<div class="issue">
+							<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+							<div class="description" data-bind="html: fields.summary"></div>
+						</div>
+					</li>
+				</ul>
+			</div>	
+		</div>
+
+		<!-- /ko -->
+
+</body>
+</html>
