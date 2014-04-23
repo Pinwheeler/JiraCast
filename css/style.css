@@ -1,21 +1,31 @@
 html
 {
     height: 100%;
+    width:100%;
 }
 
 body {
 	background-color: #211e1e;
 	min-height: 100%;
-	display: table;
+	min-width: 100%;
+	padding: 0;
+	margin: 0;
+	display:table;
 }
+
 
 .content {
 	display: table-cell;
 	vertical-align: middle;
 }
 
+.band {
+	min-width: 100%;
+	display: table;
+}
+
 .container {
-	padding: 20px;
+	padding: 40px;
 	display: table-cell;
 	vertical-align: middle;
 }
@@ -26,17 +36,10 @@ body {
 
 #right-container{
 	overflow:hidden;
-	
 }
 
 
-.graph {
-	font-weight: bold;
-	color: #fbf0f0;
-	height: auto;
-	padding: inherit;
-	
-}
+
 
 .timer {
 	background-repeat: no-repeat;
@@ -49,4 +52,52 @@ h1 {
 	font-size: 65px;
 }
 
+.name {
+  font-size: 40px;
+  width: 100%;
+  display: inline-block; }
+
+
+.issues-info {
+	font-weight: bold;
+	color: #fbf0f0;
+	height: auto;
+	width: 100%;
+	float: right;
+	
+	
+}
+
+.list {
+	width: 100%;
+	float: left;
+	margin-top: 20px; }
+	.list span {
+		float: left; }
+	.list hr {
+		float: left;
+		width: 50%;
+		clear: left; }
+	.list ul {
+		float: left;
+		width: 100%;
+		margin: 0;
+		padding: 0; }
+		.list ul li {
+			list-style-type: none;
+			float: left;
+			width: 100%; }
+		.list ul li .issue {
+		    position: relative;
+			float: left;
+			font-size: 10px;
+			color: #fff; }
+			.list ul li .issue .header {
+				float: left;
+				font-size: 12px;
+				font-weight: 700;
+				text-align: left; }
+			.list ul li .issue .description {
+				float: left;
+				line-height: 17px; }
 
