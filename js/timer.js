@@ -1,12 +1,17 @@
-$( document ).ready(function() {
+$( document ).ready(function(){
+start_timer(60);
+});
+
+function start_timer(seconds) {
 		// Handler for .ready() called.
-		var seconds = 60; //This should be able to be dynamically set: running time of timer in seconds
 		var millis = seconds * 100;
+		var $s = $("#timerknob")
+		$s.defaultValue = millis.toString();
+		$s.val(millis).trigger("change");
 		var tid = setInterval(tick_down, 50);
 		function tick_down() {
 			millis-=5;
 			// refresh view
-			var $s = $("#timerknob")
 			$s.val(millis).trigger("change");
 			if (millis == 0)
 			{
@@ -17,4 +22,4 @@ $( document ).ready(function() {
 		{
 			clearInterval(tid);
 		}
-		});
+		}
