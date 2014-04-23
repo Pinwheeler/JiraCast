@@ -1,0 +1,52 @@
+html
+{
+    height: 100%;
+}
+
+body {
+	background-color: #211e1e;
+	min-height: 100%;
+	display: table;
+}
+
+.content {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.container {
+	padding: 20px;
+	display: table-cell;
+	vertical-align: middle;
+}
+
+#left-container {
+	
+}
+
+#right-container{
+	overflow:hidden;
+	
+}
+
+
+.graph {
+	font-weight: bold;
+	color: #fbf0f0;
+	height: auto;
+	padding: inherit;
+	
+}
+
+.timer {
+	background-repeat: no-repeat;
+	
+}
+
+h1 {
+	color: white;
+	text-align: center;
+	font-size: 65px;
+}
+
+
