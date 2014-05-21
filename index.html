@@ -2,6 +2,7 @@
 <html>
   <head>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+
 	
     <title>JiraCast</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
@@ -19,7 +20,8 @@
   </head>
   <body>
   	<div class="content">
-  	<h1 id="name">JiraCast</h1>
+	  	<h1 id="name" data-bind="text: displayName">JiraCast</h1>
+  		<div class="band">
 			<div class="container" id="left-container">
 				<div class="timer display" style="background-image: url(img/default.png);">
 			
@@ -35,10 +37,64 @@
 				</div>
 	        </div>
 	        <div class="container" id ="right-container">
-  				<div class="graph">
-	        		<p>This is where the JIRA api representation will go. I just have a lot of text here to fill up the space for dynamic loading.</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+	        			<!--<div class="name" data-bind="text: displayName">We are hiring drunks for social events.<br/>We are serious people!</div>-->
+		
+		<!-- ko if: showInfo() -->
+
+				<div class="issues-info">
+					<div class="list">
+						<span>Open</span>
+						<hr>
+						<ul data-bind="foreach: openIssues">
+							<li>
+								<div class="issue">
+									<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+									<div class="description" data-bind="html: fields.summary"></div>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="list">
+						<span>In Progress</span>
+						<hr>
+						<ul data-bind="foreach: inProgressIssues">
+							<li>
+								<div class="issue">
+									<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+									<div class="description" data-bind="html: fields.summary"></div>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="list">
+						<span>In Review</span>
+						<hr>
+						<ul data-bind="foreach: inReviewIssues">
+							<li>
+								<div class="issue">
+									<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+									<div class="description" data-bind="html: fields.summary"></div>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="list">
+						<span>Closed</span>
+						<hr>
+						<ul data-bind="foreach: closedIssues">
+							<li>
+								<div class="issue">
+									<div class="header" data-bind="html: key + '&nbsp;-&nbsp;'"></div>
+									<div class="description" data-bind="html: fields.summary"></div>
+								</div>
+							</li>
+						</ul>
+					</div>	
 				</div>
-  			</div>
+		
+				<!-- /ko -->
+				</div>
+		</div>
   	</div>
   	<script src="js/timer.js"></script>
   	<script>
